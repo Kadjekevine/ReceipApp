@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/pages/register_page.dart';
 
@@ -10,6 +11,8 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _emailController = TextEditingController();
+    final _passwordController = TextEditingController();
     return Scaffold(
       body: Center(
         child: Column(
@@ -32,9 +35,12 @@ class LoginPage extends StatelessWidget {
               margin: EdgeInsets.all(12),
               child: TextField(
                 decoration: InputDecoration(
-                    hintText: "Email",
-                    border:
-                        OutlineInputBorder(borderSide: BorderSide(width: 1))),
+                  hintText: "Email",
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(width: 1),
+                  ),
+                ),
+                controller: _emailController,
               ),
             ),
             SizedBox(height: 10),
@@ -42,16 +48,32 @@ class LoginPage extends StatelessWidget {
               margin: EdgeInsets.all(12),
               child: TextField(
                 decoration: InputDecoration(
-                    hintText: "Password",
-                    border:
-                        OutlineInputBorder(borderSide: BorderSide(width: 1))),
+                  hintText: "Password",
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(width: 1),
+                  ),
+                ),
+                controller: _passwordController,
+                obscureText: true,
               ),
             ),
             SizedBox(height: 25),
             GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => Home()));
+                onTap: () async {
+                  try {
+                    final credential = await FirebaseAuth.instance
+                        .signInWithEmailAndPassword(
+                            email: _emailController.text.trim(),
+                            password: _passwordController.text.trim());
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Home()));
+                  } on FirebaseAuthException catch (e) {
+                    if (e.code == 'user-not-found') {
+                      print('No user found for that email.');
+                    } else if (e.code == 'wrong-password') {
+                      print('Wrong password provided for that user.');
+                    }
+                  }
                 },
                 child: Container(
                     padding: EdgeInsets.symmetric(

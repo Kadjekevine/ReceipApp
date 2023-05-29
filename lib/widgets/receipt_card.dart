@@ -19,7 +19,7 @@ class ReceiptCard extends StatelessWidget {
       width: MediaQuery.of(context).size.width - 30,
       height: MediaQuery.of(context).size.height * 0.3,
       decoration: BoxDecoration(
-        image: DecorationImage(image: AssetImage(image), fit: BoxFit.cover),
+        image: DecorationImage(image: NetworkImage(image), fit: BoxFit.cover),
         color: Colors.grey,
         borderRadius: BorderRadius.circular(10),
       ),

@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/home.dart';
 import 'package:flutter_application_1/pages/login_page.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -11,6 +13,9 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
+    final _nameController = TextEditingController();
+    final _emailController = TextEditingController();
+    final _passwordController = TextEditingController();
     return Scaffold(
       body: Center(
         child: Column(
@@ -33,9 +38,12 @@ class _RegisterPageState extends State<RegisterPage> {
               margin: EdgeInsets.all(12),
               child: TextField(
                 decoration: InputDecoration(
-                    hintText: "Name",
-                    border:
-                        OutlineInputBorder(borderSide: BorderSide(width: 1))),
+                  hintText: "Name",
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(width: 1),
+                  ),
+                ),
+                controller: _nameController,
               ),
             ),
             SizedBox(height: 10),
@@ -43,9 +51,12 @@ class _RegisterPageState extends State<RegisterPage> {
               margin: EdgeInsets.all(12),
               child: TextField(
                 decoration: InputDecoration(
-                    hintText: "Email",
-                    border:
-                        OutlineInputBorder(borderSide: BorderSide(width: 1))),
+                  hintText: "Email",
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(width: 1),
+                  ),
+                ),
+                controller: _emailController,
               ),
             ),
             SizedBox(height: 10),
@@ -53,16 +64,35 @@ class _RegisterPageState extends State<RegisterPage> {
               margin: EdgeInsets.all(12),
               child: TextField(
                 decoration: InputDecoration(
-                    hintText: "Password",
-                    border:
-                        OutlineInputBorder(borderSide: BorderSide(width: 1))),
+                  hintText: "Password",
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(width: 1),
+                  ),
+                ),
+                controller: _passwordController,
+                obscureText: true,
               ),
             ),
             SizedBox(height: 25),
             GestureDetector(
-                onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => LoginPage()));
+                onTap: () async {
+                  try {
+                    final credential = await FirebaseAuth.instance
+                        .createUserWithEmailAndPassword(
+                      email: _emailController.text.trim(),
+                      password: _passwordController.text.trim(),
+                    );
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Home()));
+                  } on FirebaseAuthException catch (e) {
+                    if (e.code == 'weak-password') {
+                      print('The password provided is too weak.');
+                    } else if (e.code == 'email-already-in-use') {
+                      print('The account already exists for that email.');
+                    }
+                  } catch (e) {
+                    print(e);
+                  }
                 },
                 child: Container(
                     padding: EdgeInsets.symmetric(
